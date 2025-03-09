@@ -7,3 +7,7 @@
 #   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
+
+File.readlines('valid_words.txt').each do |line|
+  Word.find_or_create_by(word: line.strip.downcase, used: false)
+end
