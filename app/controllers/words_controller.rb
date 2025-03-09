@@ -3,8 +3,48 @@ class WordsController < ApplicationController
 
   # GET /words or /words.json
   def index
-    @words = Word.all
+    @words = Word.where(used: false)
+
+    # 1. Filter by known pattern (e.g., "s__et")
+    if params[:pattern].present?
+      pattern = params[:pattern]
+      pattern.chars.each_with_index do |letter, index|
+        if letter != "_"
+          # Filter words to ensure the letter is at the correct index
+          @words = @words.where("SUBSTR(word, ?, 1) = ?", index + 1, letter)
+        end
+      end
+    end
+
+    # 2. Filter by included letters (e.g., must include 'A' and 'T')
+    if params[:include].present?
+      include_letters = params[:include].chars
+      include_letters.each do |letter|
+        @words = @words.where("word LIKE ?", "%#{letter}%")
+      end
+    end
+
+    # 3. Filter by excluded letters (e.g., must NOT include 'X' or 'Y')
+    if params[:exclude].present?
+      exclude_letters = params[:exclude].chars
+      exclude_letters.each do |letter|
+        @words = @words.where.not("word LIKE ?", "%#{letter}%")
+      end
+    end
+
+    # 4. Filter by forbidden positions (e.g., 's:1,t:3' means 'S' cannot be at index 1)
+    if params[:forbidden].present?
+      forbidden_entries = params[:forbidden].split(",") # Split input by commas
+      forbidden_entries.each do |entry|
+        letter, index = entry.split(":") # Extract letter and index
+        index = index.to_i - 1           # Convert 1-based index to 0-based
+
+        # Ensure letter is not at this position
+        @words = @words.where.not("SUBSTR(word, ?, 1) = ?", index + 1, letter)
+      end
+    end
   end
+  
 
   # GET /words/1 or /words/1.json
   def show

@@ -1,16 +1,27 @@
-<p style="color: green"><%= notice %></p>
+<h1>Wordle Helper</h1>
 
-<% content_for :title, "Words" %>
+<form method="get">
+  <label>Pattern (use _ for unknown letters):</label>
+  <input type="text" name="pattern" value="<%= params[:pattern] %>">
+  <br/>
+  
+  <label>Include Letters (anywhere in the word):</label>
+  <input type="text" name="include" value="<%= params[:include] %>">
+  <br/>
 
-<h1>Words</h1>
+  <label>Exclude Letters (not in the word):</label>
+  <input type="text" name="exclude" value="<%= params[:exclude] %>">
+  <br/>
 
-<div id="words">
+  <label>Forbidden Positions (letter:index, e.g., 's:1,t:3'):</label>
+  <input type="text" name="forbidden" value="<%= params[:forbidden] %>">
+  <br/>
+  
+  <input type="submit" value="Search">
+</form>
+
+<ul>
   <% @words.each do |word| %>
-    <%= render word %>
-    <p>
-      <%= link_to "Show this word", word %>
-    </p>
+    <li><%= word.word %></li>
   <% end %>
-</div>
-
-<%= link_to "New word", new_word_path %>
+</ul>
